@@ -261,11 +261,19 @@ async def on_guild_channel_delete(channel):
             if entry.target.id == channel.id:
                 executor = entry.user
 
-                if executor.id in config['whitelist_users'] or executor.id == OWNER_ID:
-                    status = "Owner do Bot" if executor.id == OWNER_ID else "Usuário Autorizado"
+                # 👑 OWNER E WHITELIST TÊM PROTEÇÃO TOTAL
+                if executor.id == OWNER_ID:
                     await security_system.log_security_action(
                         guild,
-                        f"Canal Deletado - {status}",
+                        "Canal Deletado - 👑 OWNER DO BOT",
+                        f"🟢 {executor.mention} (OWNER) deletou o canal #{channel.name} - ✅ **AUTORIZADO**",
+                        COLORS['success']
+                    )
+                    return
+                elif executor.id in config['whitelist_users']:
+                    await security_system.log_security_action(
+                        guild,
+                        "Canal Deletado - Usuário Autorizado",
                         f"🟢 {executor.mention} deletou o canal #{channel.name}",
                         COLORS['success']
                     )
@@ -330,11 +338,19 @@ async def on_guild_role_delete(role):
             if entry.target.id == role.id:
                 executor = entry.user
 
-                if executor.id in config['whitelist_users'] or executor.id == OWNER_ID:
-                    status = "Owner do Bot" if executor.id == OWNER_ID else "Usuário Autorizado"
+                # 👑 OWNER E WHITELIST TÊM PROTEÇÃO TOTAL
+                if executor.id == OWNER_ID:
                     await security_system.log_security_action(
                         guild,
-                        f"Cargo Deletado - {status}",
+                        "Cargo Deletado - 👑 OWNER DO BOT",
+                        f"🟢 {executor.mention} (OWNER) deletou o cargo @{role.name} - ✅ **AUTORIZADO**",
+                        COLORS['success']
+                    )
+                    return
+                elif executor.id in config['whitelist_users']:
+                    await security_system.log_security_action(
+                        guild,
+                        "Cargo Deletado - Usuário Autorizado",
                         f"🟢 {executor.mention} deletou o cargo @{role.name}",
                         COLORS['success']
                     )
@@ -507,9 +523,10 @@ def is_owner():
 
 def is_staff():
     async def predicate(ctx):
-        # Owner sempre tem acesso, não é afetado por nenhuma restrição
+        # 👑 OWNER TEM PODER ABSOLUTO - SEMPRE PODE USAR QUALQUER COMANDO
         if ctx.author.id == OWNER_ID:
             return True
+        # Para outros usuários, precisa ser administrador
         return ctx.author.guild_permissions.administrator
     return commands.check(predicate)
 
@@ -760,9 +777,14 @@ async def view_backups(ctx):
 @is_staff()
 async def warn_user(ctx, user: discord.Member, *, reason: str = "Sem motivo especificado"):
     """Aplica aviso a um usuário"""
-    # Owner não pode receber avisos
+    # 👑 OWNER DO BOT É INTOCÁVEL - PROTEÇÃO ABSOLUTA
     if user.id == OWNER_ID:
-        await ctx.send("❌ Não é possível avisar o owner do bot!")
+        embed = discord.Embed(
+            title="👑 PROTEÇÃO DO OWNER",
+            description="❌ **O OWNER DO BOT É COMPLETAMENTE INTOCÁVEL!**\n🛡️ Nenhum comando pode afetar o dono do bot por segurança.",
+            color=COLORS['danger']
+        )
+        await ctx.send(embed=embed)
         return
     user_id = str(user.id)
     guild_id = str(ctx.guild.id)
@@ -862,9 +884,14 @@ async def clear_warnings(ctx, user: discord.Member):
 @is_staff()
 async def mute_user(ctx, user: discord.Member, duration: int = 300, *, reason: str = "Sem motivo"):
     """Muta um usuário temporariamente"""
-    # Owner não pode ser mutado
+    # 👑 OWNER DO BOT É INTOCÁVEL - PROTEÇÃO ABSOLUTA
     if user.id == OWNER_ID:
-        await ctx.send("❌ Não é possível mutar o owner do bot!")
+        embed = discord.Embed(
+            title="👑 PROTEÇÃO DO OWNER",
+            description="❌ **O OWNER DO BOT É COMPLETAMENTE INTOCÁVEL!**\n🛡️ Nenhum comando pode afetar o dono do bot por segurança.",
+            color=COLORS['danger']
+        )
+        await ctx.send(embed=embed)
         return
         
     try:
@@ -920,9 +947,14 @@ async def unmute_user(ctx, user: discord.Member):
 @is_staff()
 async def ban_user(ctx, user: discord.Member, *, motivo: str = "Sem motivo especificado"):
     """Bane um usuário do servidor"""
-    # Owner não pode ser banido
+    # 👑 OWNER DO BOT É INTOCÁVEL - PROTEÇÃO ABSOLUTA
     if user.id == OWNER_ID:
-        await ctx.send("❌ Não é possível banir o owner do bot!")
+        embed = discord.Embed(
+            title="👑 PROTEÇÃO DO OWNER",
+            description="❌ **O OWNER DO BOT É COMPLETAMENTE INTOCÁVEL!**\n🛡️ Nenhum comando pode afetar o dono do bot por segurança.",
+            color=COLORS['danger']
+        )
+        await ctx.send(embed=embed)
         return
         
     try:
@@ -953,9 +985,14 @@ async def ban_user(ctx, user: discord.Member, *, motivo: str = "Sem motivo espec
 @is_staff()
 async def kick_user(ctx, user: discord.Member, *, motivo: str = "Sem motivo especificado"):
     """Expulsa um usuário do servidor"""
-    # Owner não pode ser expulso
+    # 👑 OWNER DO BOT É INTOCÁVEL - PROTEÇÃO ABSOLUTA
     if user.id == OWNER_ID:
-        await ctx.send("❌ Não é possível expulsar o owner do bot!")
+        embed = discord.Embed(
+            title="👑 PROTEÇÃO DO OWNER",
+            description="❌ **O OWNER DO BOT É COMPLETAMENTE INTOCÁVEL!**\n🛡️ Nenhum comando pode afetar o dono do bot por segurança.",
+            color=COLORS['danger']
+        )
+        await ctx.send(embed=embed)
         return
         
     try:
