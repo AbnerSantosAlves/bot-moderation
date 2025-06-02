@@ -768,7 +768,6 @@ async def view_warnings(ctx, user: discord.Member = None):
     if not user:
         user = ctx.author
 
-    ```python
     user_id = str(user.id)
     guild_id = str(ctx.guild.id)
 
@@ -1561,7 +1560,6 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.CheckFailure):
         # Verifica se é um comando que precisa de owner ou staff
         command_name = ctx.command.name if ctx.command else "desconhecido"
-        ```python
         owner_only_commands = ['config', 'whitelist', 'limpar', 'criar_cargo', 'deletar_cargo', 'backup_server']
 
         if command_name in owner_only_commands:
