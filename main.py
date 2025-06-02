@@ -763,7 +763,8 @@ async def warn_user(ctx, user: discord.Member, *, reason: str = "Sem motivo espe
 
 @bot.command(name='warnings', aliases=['avisos'])
 @is_staff()
-async def view_warnings(ctx, user: discord.Member = None):    """Visualiza avisos de um usuário"""
+async def view_warnings(ctx, user: discord.Member = None):
+    """Visualiza avisos de um usuário"""
     if not user:
         user = ctx.author
 
