@@ -1,0 +1,210 @@
+{
+  "restored_roles": {
+    "1323305782086996039": {
+      "roles": [
+        1319062811804041310,
+        1319062794821304390,
+        1319062777205227602,
+        1319062752345460737,
+        1328479361216811033,
+        1319062746557321286,
+        1319062738684743690,
+        1319062722830405653,
+        1319062681629491211,
+        1319062654039363696,
+        1319062652755906560,
+        1319062645407486055,
+        1319062694485299292,
+        1319062620107571311,
+        1327016110528270456,
+        1319062588671131790,
+        1319062581176041493,
+        1328272677982572636
+      ],
+      "removed_at": "2025-06-01T03:02:54.415549",
+      "reason": "Deletou canal #dafsafas",
+      "guild_id": 1097629413711024189
+    }
+  },
+  "security_logs": [
+    {
+      "timestamp": "2025-06-01T01:19:56.171572",
+      "title": "🚨 AÇÃO SUSPEITA DETECTADA - Canal Deletado",
+      "description": "⚠️ **<@1323305782086996039>** deletou o canal **#│﹒◜📝﹑・𝐀valiar-𝐅ormulários﹢** e teve todos os cargos removidos!",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T01:25:33.027377",
+      "title": "🤖 Bot Banido Automaticamente",
+      "description": "🚫 **<@831140416312180756>** foi banido automaticamente por ser um bot.",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T01:26:48.323116",
+      "title": "🔄 Cargos Restaurados Manualmente",
+      "description": "Cargos de <@1323305782086996039> foram restaurados por <@983196900910039090>",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T01:47:28.770424",
+      "title": "🚨 AÇÃO SUSPEITA DETECTADA - Canal Deletado",
+      "description": "⚠️ **<@1323305782086996039>** deletou o canal **#⟢🏟՞꒱𝅄𝐀rena-𝐂ondá˘͈ᨓ੭** e teve todos os cargos removidos!",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T01:49:33.468301",
+      "title": "🔄 Cargos Restaurados Manualmente",
+      "description": "Cargos de <@1323305782086996039> foram restaurados por <@983196900910039090>",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T01:51:05.183612",
+      "title": "🚨 AÇÃO SUSPEITA DETECTADA - Canal Deletado",
+      "description": "⚠️ **<@1323305782086996039>** deletou o canal **#⟢🏟՞꒱𝅄𝐇eriberto-𝐇ülse˘͈ᨓ੭** e teve todos os cargos removidos!",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T02:02:48.431526",
+      "title": "🚨 CANAL DELETADO - RECRIADO AUTOMATICAMENTE",
+      "description": "⚠️ **<@1354174241007861944>** deletou o canal **#﹕𝐂md²ꜝꜝ〃👾৯** mas foi recriado automaticamente!",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T02:05:55.726764",
+      "title": "🔄 Cargos Restaurados Manualmente",
+      "description": "Cargos de <@1354174241007861944> foram restaurados por <@983196900910039090>",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T02:24:54.764628",
+      "title": "🚨 CARGO DELETADO - RECRIADO AUTOMATICAMENTE",
+      "description": "⚠️ **<@1323305782086996039>** deletou o cargo **@GarticMod** mas foi recriado automaticamente!",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T02:27:45.007778",
+      "title": "🔄 Cargos Restaurados Manualmente",
+      "description": "Cargos de <@1323305782086996039> foram restaurados por <@983196900910039090>",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T02:32:35.118895",
+      "title": "🚨 CARGO DELETADO - RECRIADO AUTOMATICAMENTE",
+      "description": "⚠️ **<@1323305782086996039>** deletou o cargo **@GarticMod** mas foi recriado automaticamente!",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T02:37:35.766948",
+      "title": "🚨 CANAL DELETADO - RECRIADO AUTOMATICAMENTE",
+      "description": "⚠️ **<@1376272747117940847>** deletou o canal **#﹕𝐂inemaꜝꜝ〃🍿৯** mas foi recriado automaticamente!",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T02:37:42.461317",
+      "title": "🚨 CANAL DELETADO - RECRIADO AUTOMATICAMENTE",
+      "description": "⚠️ **<@1376272747117940847>** deletou o canal **#﹕𝐂inemaꜝꜝ〃🍿৯** mas foi recriado automaticamente!",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T02:37:42.593711",
+      "title": "🚨 CANAL DELETADO - RECRIADO AUTOMATICAMENTE",
+      "description": "⚠️ **<@1376272747117940847>** deletou o canal **#﹕𝐂inemaꜝꜝ〃🍿৯** mas foi recriado automaticamente!",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T02:37:43.094081",
+      "title": "🚨 CANAL DELETADO - RECRIADO AUTOMATICAMENTE",
+      "description": "⚠️ **<@1376272747117940847>** deletou o canal **#﹕𝐂inemaꜝꜝ〃🍿৯** mas foi recriado automaticamente!",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T02:40:19.379808",
+      "title": "🔄 Cargos Restaurados Manualmente",
+      "description": "Cargos de <@1376272747117940847> foram restaurados por <@983196900910039090>",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T02:51:38.840398",
+      "title": "🚨 CANAL DELETADO - RECRIADO AUTOMATICAMENTE",
+      "description": "⚠️ **<@1323305782086996039>** deletou o canal **#dad** mas foi recriado automaticamente!",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T02:52:17.074318",
+      "title": "🔄 Cargos Restaurados Manualmente",
+      "description": "Cargos de <@1323305782086996039> foram restaurados por <@983196900910039090>",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T02:53:56.708776",
+      "title": "🚨 CANAL DELETADO - RECRIADO AUTOMATICAMENTE",
+      "description": "⚠️ **<@1323305782086996039>** deletou o canal **#dasdadd** mas foi recriado automaticamente!",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T02:54:59.376365",
+      "title": "🔄 Cargos Restaurados Manualmente",
+      "description": "Cargos de <@1323305782086996039> foram restaurados por <@983196900910039090>",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T02:56:22.599137",
+      "title": "🚨 CANAL DELETADO - RECRIADO AUTOMATICAMENTE",
+      "description": "⚠️ **<@1323305782086996039>** deletou o canal **#dad** mas foi recriado automaticamente!",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T02:57:01.270153",
+      "title": "Canal Deletado - Usuário Autorizado",
+      "description": "🟢 <@983196900910039090> deletou o canal, mas está na whitelist.",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T02:57:04.816202",
+      "title": "Canal Deletado - Usuário Autorizado",
+      "description": "🟢 <@983196900910039090> deletou o canal, mas está na whitelist.",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T02:57:05.468577",
+      "title": "🔄 Cargos Restaurados Manualmente",
+      "description": "Cargos de <@1323305782086996039> foram restaurados por <@983196900910039090>",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T02:59:40.339538",
+      "title": "🚨 CANAL DELETADO - RECRIADO AUTOMATICAMENTE",
+      "description": "⚠️ **<@1323305782086996039>** deletou o canal **#dafsafas** mas foi recriado automaticamente!",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T03:00:59.373621",
+      "title": "🔄 Cargos Restaurados Manualmente",
+      "description": "Cargos de <@1323305782086996039> foram restaurados por <@983196900910039090>",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T03:03:13.414800",
+      "title": "🚨 CANAL DELETADO - RECRIADO AUTOMATICAMENTE",
+      "description": "⚠️ **<@1323305782086996039>** deletou o canal **#dafsafas** mas foi recriado automaticamente!",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T03:07:42.449584",
+      "title": "🚨 CANAL DELETADO - RECRIADO AUTOMATICAMENTE",
+      "description": "⚠️ **<@390495283034718230>** deletou o canal **#dafsafas** mas foi recriado automaticamente!",
+      "guild_id": 1097629413711024189
+    },
+    {
+      "timestamp": "2025-06-01T03:08:48.547267",
+      "title": "🔄 Cargos Restaurados Manualmente",
+      "description": "Cargos de <@390495283034718230> foram restaurados por <@983196900910039090>",
+      "guild_id": 1097629413711024189
+    }
+  ],
+  "config": {
+    "auto_ban_bots": true,
+    "role_delete_punishment": "ban",
+    "logs_channel_name": "security-logs"
+  }
+}
