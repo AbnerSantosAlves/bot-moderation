@@ -763,8 +763,7 @@ async def warn_user(ctx, user: discord.Member, *, reason: str = "Sem motivo espe
 
 @bot.command(name='warnings', aliases=['avisos'])
 @is_staff()
-async def view_warnings(ctx, user: discord.Member = None):
-    """Visualiza avisos de um usuário"""
+async def view_warnings(ctx, user: discord.Member = None):    """Visualiza avisos de um usuário"""
     if not user:
         user = ctx.author
 
@@ -1267,7 +1266,7 @@ async def delete_role(ctx, *, nome_cargo: str):
     except Exception as e:
         await ctx.send(f"❌ Erro ao deletar cargo: {e}")
 
-@bot.command(name='backup_server', aliases=['backup'])
+@bot.command(name='backup_server', aliases=['backup_completo'])
 @is_owner()
 async def backup_server(ctx):
     """Cria backup completo do servidor"""
@@ -1547,7 +1546,7 @@ async def security_help(ctx):
 
     embed.add_field(
         name="⚠️ Importante",
-        value="• Apenas o owner do bot pode usar comandos\n• Configurações são por servidor\n• Configure canal de logs primeiro\n• Use `!sec_backup` para backup completo",
+        value="• Apenas o owner do bot pode usar comandos\n• Configurações são por servidor\n• Configure canal de logs primeiro\n• Use `!sec_backup_completo` para backup completo",
         inline=False
     )
 
