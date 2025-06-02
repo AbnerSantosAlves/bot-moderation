@@ -181,17 +181,53 @@ security_system = SecurityBot()
 async def on_ready():
     """Evento executado quando o bot está pronto"""
     await security_system.load_data()
-    print("🔒 Sistema de Segurança está ONLINE!")
-    print("=" * 50)
-    print(f"✅ Conectado em {len(bot.guilds)} servidores")
-    print("✅ Proteções ativas por servidor:")
-    print("  • Detecção de exclusão de canais/cargos")
-    print("  • Banimento automático de bots")
-    print("  • Anti-spam e proteção contra mass ping")
-    print("  • Sistema de logs personalizável")
-    print("  • Backup automático de canais/cargos")
-    print("  • Sistema de avisos e punições")
-    print("=" * 50)
+    
+    # Status interessante e dinâmico
+    activities = [
+        discord.Activity(type=discord.ActivityType.watching, name=f"🔒 {len(bot.guilds)} servidores protegidos"),
+        discord.Activity(type=discord.ActivityType.listening, name="🛡️ Detectando ameaças 24/7"),
+        discord.Activity(type=discord.ActivityType.playing, name="⚡ Sistema Anti-Raid Ativo"),
+        discord.Game(name="🚀 Máxima Segurança Garantida!"),
+    ]
+    
+    # Define um status aleatório
+    import random
+    chosen_activity = random.choice(activities)
+    await bot.change_presence(
+        status=discord.Status.online,
+        activity=chosen_activity
+    )
+    
+    print("🔥" + "=" * 60 + "🔥")
+    print("⚡           SISTEMA DE SEGURANÇA AVANÇADO           ⚡")
+    print("🔥" + "=" * 60 + "🔥")
+    print(f"🚀 STATUS: OPERACIONAL | SERVIDORES: {len(bot.guilds)}")
+    print("🛡️ PROTEÇÕES ATIVAS:")
+    print("   ⚡ Anti-Raid System        - ATIVO")
+    print("   🤖 Bot Detection          - ATIVO") 
+    print("   📢 Anti-Spam Engine       - ATIVO")
+    print("   🔒 Channel/Role Guard     - ATIVO")
+    print("   💾 Auto-Backup System    - ATIVO")
+    print("   📋 Advanced Logging       - ATIVO")
+    print("   ⚠️ Warning System         - ATIVO")
+    print("   👑 Owner Protection       - MÁXIMO")
+    print("🔥" + "=" * 60 + "🔥")
+    print("💎 OWNER DO BOT É COMPLETAMENTE INTOCÁVEL!")
+    print("⚡ NENHUM COMANDO PODE AFETAR O DONO DO BOT!")
+    print("🔥" + "=" * 60 + "🔥")
+    
+    # Atualiza status a cada 30 segundos
+    async def update_status():
+        while True:
+            await asyncio.sleep(30)
+            new_activity = random.choice(activities)
+            await bot.change_presence(
+                status=discord.Status.online,
+                activity=new_activity
+            )
+    
+    # Inicia task de atualização de status
+    bot.loop.create_task(update_status())
 
 @bot.event
 async def on_guild_channel_delete(channel):
@@ -225,10 +261,11 @@ async def on_guild_channel_delete(channel):
             if entry.target.id == channel.id:
                 executor = entry.user
 
-                if executor.id in config['whitelist_users']:
+                if executor.id in config['whitelist_users'] or executor.id == OWNER_ID:
+                    status = "Owner do Bot" if executor.id == OWNER_ID else "Usuário Autorizado"
                     await security_system.log_security_action(
                         guild,
-                        "Canal Deletado - Usuário Autorizado",
+                        f"Canal Deletado - {status}",
                         f"🟢 {executor.mention} deletou o canal #{channel.name}",
                         COLORS['success']
                     )
@@ -293,10 +330,11 @@ async def on_guild_role_delete(role):
             if entry.target.id == role.id:
                 executor = entry.user
 
-                if executor.id in config['whitelist_users']:
+                if executor.id in config['whitelist_users'] or executor.id == OWNER_ID:
+                    status = "Owner do Bot" if executor.id == OWNER_ID else "Usuário Autorizado"
                     await security_system.log_security_action(
                         guild,
-                        "Cargo Deletado - Usuário Autorizado",
+                        f"Cargo Deletado - {status}",
                         f"🟢 {executor.mention} deletou o cargo @{role.name}",
                         COLORS['success']
                     )
@@ -469,7 +507,10 @@ def is_owner():
 
 def is_staff():
     async def predicate(ctx):
-        return ctx.author.guild_permissions.administrator or ctx.author.id == OWNER_ID
+        # Owner sempre tem acesso, não é afetado por nenhuma restrição
+        if ctx.author.id == OWNER_ID:
+            return True
+        return ctx.author.guild_permissions.administrator
     return commands.check(predicate)
 
 @bot.command(name='config', aliases=['c'])
@@ -719,6 +760,10 @@ async def view_backups(ctx):
 @is_staff()
 async def warn_user(ctx, user: discord.Member, *, reason: str = "Sem motivo especificado"):
     """Aplica aviso a um usuário"""
+    # Owner não pode receber avisos
+    if user.id == OWNER_ID:
+        await ctx.send("❌ Não é possível avisar o owner do bot!")
+        return
     user_id = str(user.id)
     guild_id = str(ctx.guild.id)
 
@@ -817,6 +862,11 @@ async def clear_warnings(ctx, user: discord.Member):
 @is_staff()
 async def mute_user(ctx, user: discord.Member, duration: int = 300, *, reason: str = "Sem motivo"):
     """Muta um usuário temporariamente"""
+    # Owner não pode ser mutado
+    if user.id == OWNER_ID:
+        await ctx.send("❌ Não é possível mutar o owner do bot!")
+        return
+        
     try:
         await user.timeout(
             timedelta(seconds=duration),
@@ -870,6 +920,11 @@ async def unmute_user(ctx, user: discord.Member):
 @is_staff()
 async def ban_user(ctx, user: discord.Member, *, motivo: str = "Sem motivo especificado"):
     """Bane um usuário do servidor"""
+    # Owner não pode ser banido
+    if user.id == OWNER_ID:
+        await ctx.send("❌ Não é possível banir o owner do bot!")
+        return
+        
     try:
         await user.ban(reason=f"🔒 Banido por {ctx.author}: {motivo}")
 
@@ -898,6 +953,11 @@ async def ban_user(ctx, user: discord.Member, *, motivo: str = "Sem motivo espec
 @is_staff()
 async def kick_user(ctx, user: discord.Member, *, motivo: str = "Sem motivo especificado"):
     """Expulsa um usuário do servidor"""
+    # Owner não pode ser expulso
+    if user.id == OWNER_ID:
+        await ctx.send("❌ Não é possível expulsar o owner do bot!")
+        return
+        
     try:
         await user.kick(reason=f"🔒 Expulso por {ctx.author}: {motivo}")
 
@@ -1487,68 +1547,123 @@ async def make_announcement(ctx, canal: discord.TextChannel, *, mensagem: str):
 @bot.command(name='help', aliases=['h', 'ajuda'])
 async def security_help(ctx):
     """Central de ajuda"""
+    # Embed principal com design melhorado
     embed = discord.Embed(
-        title="🔒 Sistema de Segurança - Comandos",
-        description="**Sistema completo de proteção para Discord**",
-        color=COLORS['info']
+        title="⚡ SISTEMA DE SEGURANÇA AVANÇADO ⚡",
+        description="```css\n🚀 Bot de segurança mais completo do Discord!\n💎 Proteção absoluta para seu servidor\n🛡️ Sistema anti-raid, anti-spam e muito mais!```",
+        color=0x00ff41,
+        timestamp=datetime.utcnow()
     )
+    
+    embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/123456789/123456789/security_logo.png")
+    embed.set_author(name="Central de Comandos", icon_url=ctx.guild.icon.url if ctx.guild.icon else None)
 
+    # Comandos básicos com emojis melhorados
     basic_commands = [
-        "`!sec_c` - Configurações",
-        "`!sec_w` - Whitelist", 
-        "`!sec_r` - Restaurar cargos",
-        "`!sec_s` - Status do sistema",
-        "`!sec_l` - Ver logs",
-        "`!sec_b` - Ver backups"
+        "🔧 `!sec_c` ➜ Configurações do sistema",
+        "🔐 `!sec_w` ➜ Gerenciar whitelist", 
+        "🔄 `!sec_r` ➜ Restaurar cargos removidos",
+        "📊 `!sec_s` ➜ Status completo do sistema",
+        "📋 `!sec_l` ➜ Visualizar logs de segurança",
+        "💾 `!sec_b` ➜ Ver backups disponíveis"
     ]
 
+    # Comandos de moderação
     moderation_commands = [
-        "`!sec_banir @user motivo` - Banir usuário",
-        "`!sec_expulsar @user motivo` - Expulsar usuário",
-        "`!sec_m @user tempo motivo` - Mutar usuário",
-        "`!sec_desmutar @user` - Desmutar usuário",
-        "`!sec_av @user motivo` - Aplicar aviso",
-        "`!sec_avisos @user` - Ver avisos"
+        "🔨 `!sec_banir @user motivo` ➜ Banir usuário",
+        "👢 `!sec_expulsar @user motivo` ➜ Expulsar usuário", 
+        "🔇 `!sec_m @user tempo motivo` ➜ Mutar usuário",
+        "🔊 `!sec_desmutar @user` ➜ Desmutar usuário",
+        "⚠️ `!sec_av @user motivo` ➜ Aplicar aviso",
+        "📝 `!sec_avisos @user` ➜ Visualizar avisos"
     ]
 
+    # Comandos de canal
     channel_commands = [
-        "`!sec_limpar [qtd]` - Limpar mensagens",
-        "`!sec_slowmode [segundos]` - Modo lento",
-        "`!sec_bloquear` - Bloquear canal",
-        "`!sec_desbloquear` - Desbloquear canal",
-        "`!sec_anuncio #canal msg` - Fazer anúncio"
+        "🧹 `!sec_limpar [qtd]` ➜ Limpar mensagens",
+        "⏱️ `!sec_slowmode [seg]` ➜ Ativar modo lento",
+        "🔒 `!sec_bloquear` ➜ Bloquear canal atual",
+        "🔓 `!sec_desbloquear` ➜ Desbloquear canal",
+        "📢 `!sec_anuncio #canal msg` ➜ Fazer anúncio"
     ]
 
+    # Comandos utilitários
     utility_commands = [
-        "`!sec_info [@user]` - Info do usuário",
-        "`!sec_avatar [@user]` - Avatar do usuário",
-        "`!sec_servidor` - Info do servidor",
-        "`!sec_membros [status]` - Listar membros",
-        "`!sec_canais` - Listar canais",
-        "`!sec_audit [limite]` - Logs de auditoria"
+        "👤 `!sec_info [@user]` ➜ Informações do usuário",
+        "🖼️ `!sec_avatar [@user]` ➜ Avatar do usuário",
+        "🏰 `!sec_servidor` ➜ Informações do servidor",
+        "👥 `!sec_membros [status]` ➜ Listar membros",
+        "📺 `!sec_canais` ➜ Listar todos os canais",
+        "📋 `!sec_audit [limite]` ➜ Logs de auditoria"
     ]
 
+    # Comandos de cargos
     role_commands = [
-        "`!sec_cargo add/remove @user cargo` - Gerenciar cargo",
-        "`!sec_nick @user novo_nick` - Alterar nickname",
-        "`!sec_criar_cargo nome` - Criar cargo",
-        "`!sec_deletar_cargo nome` - Deletar cargo",
-        "`!sec_cargoinfo nome` - Info do cargo"
+        "🎭 `!sec_cargo add/remove @user cargo` ➜ Gerenciar cargo",
+        "✏️ `!sec_nick @user novo_nick` ➜ Alterar nickname",
+        "➕ `!sec_criar_cargo nome` ➜ Criar novo cargo",
+        "🗑️ `!sec_deletar_cargo nome` ➜ Deletar cargo",
+        "ℹ️ `!sec_cargoinfo nome` ➜ Informações do cargo"
     ]
-
-    embed.add_field(name="🎮 Básicos", value='\n'.join(basic_commands), inline=False)
-    embed.add_field(name="🛡️ Moderação", value='\n'.join(moderation_commands), inline=False)
-    embed.add_field(name="📺 Canais", value='\n'.join(channel_commands), inline=False)
-    embed.add_field(name="🔧 Utilidades", value='\n'.join(utility_commands), inline=False)
-    embed.add_field(name="🎭 Cargos", value='\n'.join(role_commands), inline=False)
-
-    embed.add_field(name="👑 Comandos Owner", value="`!sec_c` - Configurações\n`!sec_w` - Whitelist\n`!sec_limpar` - Limpar mensagens\n`!sec_criar_cargo` - Criar cargo\n`!sec_deletar_cargo` - Deletar cargo\n`!sec_backup_server` - Backup completo", inline=False)
-    embed.add_field(name="👮 Comandos Staff", value="Todos os outros comandos de moderação, logs, info, etc.", inline=False)
 
     embed.add_field(
-        name="⚠️ Importante",
-        value="• Apenas o owner do bot pode usar comandos\n• Configurações são por servidor\n• Configure canal de logs primeiro\n• Use `!sec_backup_completo` para backup completo",
+        name="🎮 ╔══ COMANDOS BÁSICOS ══╗",
+        value='\n'.join(basic_commands),
         inline=False
+    )
+    
+    embed.add_field(
+        name="🛡️ ╔══ MODERAÇÃO ══╗", 
+        value='\n'.join(moderation_commands),
+        inline=False
+    )
+    
+    embed.add_field(
+        name="📺 ╔══ GERENCIAR CANAIS ══╗",
+        value='\n'.join(channel_commands),
+        inline=False
+    )
+    
+    embed.add_field(
+        name="🔧 ╔══ UTILIDADES ══╗",
+        value='\n'.join(utility_commands),
+        inline=True
+    )
+    
+    embed.add_field(
+        name="🎭 ╔══ CARGOS ══╗",
+        value='\n'.join(role_commands),
+        inline=True
+    )
+
+    # Informações especiais
+    embed.add_field(
+        name="👑 ╔══ SUPER ADMIN ══╗",
+        value="```css\n🔥 Owner tem PODER ABSOLUTO!\n⚡ Nenhum comando afeta o owner\n🛡️ Proteção total garantida\n💎 Acesso a comandos exclusivos```",
+        inline=False
+    )
+
+    embed.add_field(
+        name="📊 ╔══ ESTATÍSTICAS ══╗",
+        value=f"```yaml\nServidores Protegidos: {len(bot.guilds)}\nUptime: Online 24/7\nProteções Ativas: Todas\nVelocidade: Ultra Rápida```",
+        inline=True
+    )
+
+    embed.add_field(
+        name="🚀 ╔══ RECURSOS ══╗",
+        value="```diff\n+ Anti-Raid Avançado\n+ Backup Automático\n+ Logs Completos\n+ Sistema de Avisos\n+ Proteção de Cargos\n+ Anti-Spam Inteligente```",
+        inline=True
+    )
+
+    embed.add_field(
+        name="⚠️ ╔══ AVISOS IMPORTANTES ══╗",
+        value="```fix\n🔴 Configure o canal de logs primeiro!\n🟡 Owner do bot é INTOCÁVEL\n🟢 Use !sec_backup_completo para backup\n🔵 Comandos staff precisam de admin```",
+        inline=False
+    )
+
+    embed.set_footer(
+        text="⚡ Sistema desenvolvido para máxima segurança | Versão 2.0 ⚡",
+        icon_url=bot.user.avatar.url if bot.user.avatar else None
     )
 
     await ctx.send(embed=embed)
