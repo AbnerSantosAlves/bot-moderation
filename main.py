@@ -862,6 +862,624 @@ async def unmute_user(ctx, user: discord.Member):
     except Exception as e:
         await ctx.send(f"❌ Erro ao desmutar usuário: {e}")
 
+@bot.command(name='banir', aliases=['ban'])
+@is_owner()
+async def ban_user(ctx, user: discord.Member, *, motivo: str = "Sem motivo especificado"):
+    """Bane um usuário do servidor"""
+    try:
+        await user.ban(reason=f"🔒 Banido por {ctx.author}: {motivo}")
+        
+        embed = discord.Embed(
+            title="🔨 Usuário Banido",
+            description=f"{user.mention} foi banido do servidor",
+            color=COLORS['danger']
+        )
+        embed.add_field(name="📝 Motivo", value=motivo, inline=False)
+        embed.add_field(name="👮 Moderador", value=ctx.author.mention, inline=True)
+        
+        await ctx.send(embed=embed)
+        
+        await security_system.log_security_action(
+            ctx.guild,
+            "🔨 Usuário Banido",
+            f"{user.mention} banido por {ctx.author.mention}",
+            COLORS['danger'],
+            [{'name': '📝 Motivo', 'value': motivo, 'inline': False}]
+        )
+        
+    except Exception as e:
+        await ctx.send(f"❌ Erro ao banir usuário: {e}")
+
+@bot.command(name='expulsar', aliases=['kick'])
+@is_owner()
+async def kick_user(ctx, user: discord.Member, *, motivo: str = "Sem motivo especificado"):
+    """Expulsa um usuário do servidor"""
+    try:
+        await user.kick(reason=f"🔒 Expulso por {ctx.author}: {motivo}")
+        
+        embed = discord.Embed(
+            title="👢 Usuário Expulso",
+            description=f"{user.mention} foi expulso do servidor",
+            color=COLORS['warning']
+        )
+        embed.add_field(name="📝 Motivo", value=motivo, inline=False)
+        embed.add_field(name="👮 Moderador", value=ctx.author.mention, inline=True)
+        
+        await ctx.send(embed=embed)
+        
+        await security_system.log_security_action(
+            ctx.guild,
+            "👢 Usuário Expulso",
+            f"{user.mention} expulso por {ctx.author.mention}",
+            COLORS['warning'],
+            [{'name': '📝 Motivo', 'value': motivo, 'inline': False}]
+        )
+        
+    except Exception as e:
+        await ctx.send(f"❌ Erro ao expulsar usuário: {e}")
+
+@bot.command(name='limpar', aliases=['clear', 'purge'])
+@is_owner()
+async def clear_messages(ctx, quantidade: int = 10):
+    """Limpa mensagens do canal"""
+    if quantidade > 100:
+        await ctx.send("❌ Máximo de 100 mensagens por vez!")
+        return
+    
+    try:
+        deleted = await ctx.channel.purge(limit=quantidade + 1)
+        
+        embed = discord.Embed(
+            title="🧹 Mensagens Limpas",
+            description=f"{len(deleted) - 1} mensagens foram deletadas",
+            color=COLORS['success']
+        )
+        embed.add_field(name="👮 Moderador", value=ctx.author.mention, inline=True)
+        embed.add_field(name="📺 Canal", value=ctx.channel.mention, inline=True)
+        
+        msg = await ctx.send(embed=embed)
+        await asyncio.sleep(3)
+        await msg.delete()
+        
+        await security_system.log_security_action(
+            ctx.guild,
+            "🧹 Mensagens Limpas",
+            f"{len(deleted) - 1} mensagens deletadas por {ctx.author.mention}",
+            COLORS['info']
+        )
+        
+    except Exception as e:
+        await ctx.send(f"❌ Erro ao limpar mensagens: {e}")
+
+@bot.command(name='slowmode', aliases=['slow'])
+@is_owner()
+async def set_slowmode(ctx, segundos: int = 0):
+    """Define modo lento no canal"""
+    try:
+        await ctx.channel.edit(slowmode_delay=segundos)
+        
+        if segundos == 0:
+            await ctx.send("✅ Modo lento desativado!")
+        else:
+            await ctx.send(f"⏱️ Modo lento ativado: {segundos} segundos")
+        
+        await security_system.log_security_action(
+            ctx.guild,
+            "⏱️ Modo Lento Alterado",
+            f"Slowmode definido para {segundos}s por {ctx.author.mention}",
+            COLORS['info']
+        )
+        
+    except Exception as e:
+        await ctx.send(f"❌ Erro ao definir modo lento: {e}")
+
+@bot.command(name='bloquear', aliases=['lock'])
+@is_owner()
+async def lock_channel(ctx):
+    """Bloqueia o canal para @everyone"""
+    try:
+        overwrite = ctx.channel.overwrites_for(ctx.guild.default_role)
+        overwrite.send_messages = False
+        await ctx.channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
+        
+        embed = discord.Embed(
+            title="🔒 Canal Bloqueado",
+            description="Canal bloqueado para @everyone",
+            color=COLORS['warning']
+        )
+        await ctx.send(embed=embed)
+        
+        await security_system.log_security_action(
+            ctx.guild,
+            "🔒 Canal Bloqueado",
+            f"Canal {ctx.channel.mention} bloqueado por {ctx.author.mention}",
+            COLORS['warning']
+        )
+        
+    except Exception as e:
+        await ctx.send(f"❌ Erro ao bloquear canal: {e}")
+
+@bot.command(name='desbloquear', aliases=['unlock'])
+@is_owner()
+async def unlock_channel(ctx):
+    """Desbloqueia o canal para @everyone"""
+    try:
+        overwrite = ctx.channel.overwrites_for(ctx.guild.default_role)
+        overwrite.send_messages = True
+        await ctx.channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
+        
+        embed = discord.Embed(
+            title="🔓 Canal Desbloqueado",
+            description="Canal desbloqueado para @everyone",
+            color=COLORS['success']
+        )
+        await ctx.send(embed=embed)
+        
+        await security_system.log_security_action(
+            ctx.guild,
+            "🔓 Canal Desbloqueado",
+            f"Canal {ctx.channel.mention} desbloqueado por {ctx.author.mention}",
+            COLORS['success']
+        )
+        
+    except Exception as e:
+        await ctx.send(f"❌ Erro ao desbloquear canal: {e}")
+
+@bot.command(name='info', aliases=['userinfo'])
+@is_owner()
+async def user_info(ctx, user: discord.Member = None):
+    """Mostra informações de um usuário"""
+    if not user:
+        user = ctx.author
+    
+    created_at = user.created_at.strftime("%d/%m/%Y %H:%M")
+    joined_at = user.joined_at.strftime("%d/%m/%Y %H:%M") if user.joined_at else "Desconhecido"
+    
+    embed = discord.Embed(
+        title=f"👤 Informações de {user.display_name}",
+        color=COLORS['info']
+    )
+    embed.set_thumbnail(url=user.avatar.url if user.avatar else None)
+    
+    embed.add_field(name="🆔 ID", value=user.id, inline=True)
+    embed.add_field(name="📅 Conta criada", value=created_at, inline=True)
+    embed.add_field(name="📥 Entrou em", value=joined_at, inline=True)
+    embed.add_field(name="🤖 Bot", value="Sim" if user.bot else "Não", inline=True)
+    embed.add_field(name="🎭 Cargos", value=len(user.roles) - 1, inline=True)
+    embed.add_field(name="🔝 Maior cargo", value=user.top_role.mention, inline=True)
+    
+    await ctx.send(embed=embed)
+
+@bot.command(name='roleinfo', aliases=['cargoinfo'])
+@is_owner()
+async def role_info(ctx, *, nome_cargo: str):
+    """Mostra informações de um cargo"""
+    role = discord.utils.get(ctx.guild.roles, name=nome_cargo)
+    
+    if not role:
+        await ctx.send("❌ Cargo não encontrado!")
+        return
+    
+    created_at = role.created_at.strftime("%d/%m/%Y %H:%M")
+    
+    embed = discord.Embed(
+        title=f"🎭 Informações do Cargo @{role.name}",
+        color=role.color
+    )
+    
+    embed.add_field(name="🆔 ID", value=role.id, inline=True)
+    embed.add_field(name="📅 Criado em", value=created_at, inline=True)
+    embed.add_field(name="👥 Membros", value=len(role.members), inline=True)
+    embed.add_field(name="📍 Posição", value=role.position, inline=True)
+    embed.add_field(name="🎨 Cor", value=str(role.color), inline=True)
+    embed.add_field(name="🔗 Mencionável", value="Sim" if role.mentionable else "Não", inline=True)
+    
+    await ctx.send(embed=embed)
+
+@bot.command(name='serverinfo', aliases=['servidor'])
+@is_owner()
+async def server_info(ctx):
+    """Mostra informações do servidor"""
+    guild = ctx.guild
+    created_at = guild.created_at.strftime("%d/%m/%Y %H:%M")
+    
+    embed = discord.Embed(
+        title=f"🏰 Informações do Servidor",
+        color=COLORS['info']
+    )
+    
+    if guild.icon:
+        embed.set_thumbnail(url=guild.icon.url)
+    
+    embed.add_field(name="📛 Nome", value=guild.name, inline=True)
+    embed.add_field(name="🆔 ID", value=guild.id, inline=True)
+    embed.add_field(name="👑 Dono", value=guild.owner.mention if guild.owner else "Desconhecido", inline=True)
+    embed.add_field(name="👥 Membros", value=guild.member_count, inline=True)
+    embed.add_field(name="📺 Canais", value=len(guild.channels), inline=True)
+    embed.add_field(name="🎭 Cargos", value=len(guild.roles), inline=True)
+    embed.add_field(name="📅 Criado em", value=created_at, inline=False)
+    
+    await ctx.send(embed=embed)
+
+@bot.command(name='avatar')
+@is_owner()
+async def show_avatar(ctx, user: discord.Member = None):
+    """Mostra o avatar de um usuário"""
+    if not user:
+        user = ctx.author
+    
+    embed = discord.Embed(
+        title=f"🖼️ Avatar de {user.display_name}",
+        color=COLORS['info']
+    )
+    
+    if user.avatar:
+        embed.set_image(url=user.avatar.url)
+        embed.add_field(name="🔗 Link direto", value=f"[Clique aqui]({user.avatar.url})", inline=False)
+    else:
+        embed.description = "Usuário não possui avatar personalizado"
+    
+    await ctx.send(embed=embed)
+
+@bot.command(name='cargo', aliases=['role'])
+@is_owner()
+async def manage_role(ctx, acao: str, user: discord.Member, *, nome_cargo: str):
+    """Adiciona ou remove cargo de um usuário"""
+    role = discord.utils.get(ctx.guild.roles, name=nome_cargo)
+    
+    if not role:
+        await ctx.send("❌ Cargo não encontrado!")
+        return
+    
+    try:
+        if acao.lower() in ['add', 'adicionar', 'dar']:
+            await user.add_roles(role, reason=f"Cargo adicionado por {ctx.author}")
+            
+            embed = discord.Embed(
+                title="✅ Cargo Adicionado",
+                description=f"Cargo @{role.name} adicionado a {user.mention}",
+                color=COLORS['success']
+            )
+            
+            await security_system.log_security_action(
+                ctx.guild,
+                "🎭 Cargo Adicionado",
+                f"@{role.name} adicionado a {user.mention} por {ctx.author.mention}",
+                COLORS['success']
+            )
+            
+        elif acao.lower() in ['remove', 'remover', 'tirar']:
+            await user.remove_roles(role, reason=f"Cargo removido por {ctx.author}")
+            
+            embed = discord.Embed(
+                title="❌ Cargo Removido",
+                description=f"Cargo @{role.name} removido de {user.mention}",
+                color=COLORS['warning']
+            )
+            
+            await security_system.log_security_action(
+                ctx.guild,
+                "🎭 Cargo Removido",
+                f"@{role.name} removido de {user.mention} por {ctx.author.mention}",
+                COLORS['warning']
+            )
+        else:
+            await ctx.send("❌ Ação inválida! Use: `adicionar` ou `remover`")
+            return
+        
+        await ctx.send(embed=embed)
+        
+    except Exception as e:
+        await ctx.send(f"❌ Erro: {e}")
+
+@bot.command(name='nick', aliases=['nickname'])
+@is_owner()
+async def change_nickname(ctx, user: discord.Member, *, novo_nick: str = None):
+    """Altera o nickname de um usuário"""
+    try:
+        old_nick = user.display_name
+        await user.edit(nick=novo_nick, reason=f"Nickname alterado por {ctx.author}")
+        
+        embed = discord.Embed(
+            title="✏️ Nickname Alterado",
+            color=COLORS['success']
+        )
+        embed.add_field(name="👤 Usuário", value=user.mention, inline=True)
+        embed.add_field(name="📝 Antes", value=old_nick, inline=True)
+        embed.add_field(name="📝 Depois", value=novo_nick or user.name, inline=True)
+        
+        await ctx.send(embed=embed)
+        
+        await security_system.log_security_action(
+            ctx.guild,
+            "✏️ Nickname Alterado",
+            f"Nickname de {user.mention} alterado por {ctx.author.mention}",
+            COLORS['info']
+        )
+        
+    except Exception as e:
+        await ctx.send(f"❌ Erro ao alterar nickname: {e}")
+
+@bot.command(name='criar_cargo', aliases=['create_role'])
+@is_owner()
+async def create_role(ctx, *, nome_cargo: str):
+    """Cria um novo cargo"""
+    try:
+        role = await ctx.guild.create_role(
+            name=nome_cargo,
+            reason=f"Cargo criado por {ctx.author}"
+        )
+        
+        embed = discord.Embed(
+            title="✅ Cargo Criado",
+            description=f"Cargo @{role.name} criado com sucesso!",
+            color=COLORS['success']
+        )
+        embed.add_field(name="🆔 ID", value=role.id, inline=True)
+        embed.add_field(name="👮 Criado por", value=ctx.author.mention, inline=True)
+        
+        await ctx.send(embed=embed)
+        
+        await security_system.log_security_action(
+            ctx.guild,
+            "🎭 Cargo Criado",
+            f"Cargo @{role.name} criado por {ctx.author.mention}",
+            COLORS['success']
+        )
+        
+    except Exception as e:
+        await ctx.send(f"❌ Erro ao criar cargo: {e}")
+
+@bot.command(name='deletar_cargo', aliases=['delete_role'])
+@is_owner()
+async def delete_role(ctx, *, nome_cargo: str):
+    """Deleta um cargo"""
+    role = discord.utils.get(ctx.guild.roles, name=nome_cargo)
+    
+    if not role:
+        await ctx.send("❌ Cargo não encontrado!")
+        return
+    
+    try:
+        role_name = role.name
+        await role.delete(reason=f"Cargo deletado por {ctx.author}")
+        
+        embed = discord.Embed(
+            title="🗑️ Cargo Deletado",
+            description=f"Cargo @{role_name} foi deletado",
+            color=COLORS['warning']
+        )
+        embed.add_field(name="👮 Deletado por", value=ctx.author.mention, inline=True)
+        
+        await ctx.send(embed=embed)
+        
+        await security_system.log_security_action(
+            ctx.guild,
+            "🗑️ Cargo Deletado",
+            f"Cargo @{role_name} deletado por {ctx.author.mention}",
+            COLORS['warning']
+        )
+        
+    except Exception as e:
+        await ctx.send(f"❌ Erro ao deletar cargo: {e}")
+
+@bot.command(name='backup_server', aliases=['backup'])
+@is_owner()
+async def backup_server(ctx):
+    """Cria backup completo do servidor"""
+    try:
+        guild = ctx.guild
+        backup_data = {
+            'server_name': guild.name,
+            'created_at': datetime.utcnow().isoformat(),
+            'channels': [],
+            'roles': [],
+            'members_count': guild.member_count
+        }
+        
+        # Backup de canais
+        for channel in guild.channels:
+            channel_data = {
+                'name': channel.name,
+                'type': str(channel.type),
+                'position': channel.position
+            }
+            if hasattr(channel, 'topic'):
+                channel_data['topic'] = channel.topic
+            backup_data['channels'].append(channel_data)
+        
+        # Backup de cargos
+        for role in guild.roles:
+            if role != guild.default_role:
+                role_data = {
+                    'name': role.name,
+                    'color': str(role.color),
+                    'position': role.position,
+                    'permissions': role.permissions.value
+                }
+                backup_data['roles'].append(role_data)
+        
+        # Salva backup
+        guild_id_str = str(guild.id)
+        if guild_id_str not in security_system.backup_data:
+            security_system.backup_data[guild_id_str] = {'channels': [], 'roles': [], 'full_backups': []}
+        
+        security_system.backup_data[guild_id_str]['full_backups'] = [backup_data]
+        await security_system.save_data()
+        
+        embed = discord.Embed(
+            title="💾 Backup Criado",
+            description="Backup completo do servidor criado com sucesso!",
+            color=COLORS['success']
+        )
+        embed.add_field(name="📺 Canais", value=len(backup_data['channels']), inline=True)
+        embed.add_field(name="🎭 Cargos", value=len(backup_data['roles']), inline=True)
+        embed.add_field(name="👥 Membros", value=backup_data['members_count'], inline=True)
+        
+        await ctx.send(embed=embed)
+        
+        await security_system.log_security_action(
+            guild,
+            "💾 Backup Criado",
+            f"Backup completo criado por {ctx.author.mention}",
+            COLORS['success']
+        )
+        
+    except Exception as e:
+        await ctx.send(f"❌ Erro ao criar backup: {e}")
+
+@bot.command(name='audit', aliases=['auditoria'])
+@is_owner()
+async def audit_logs(ctx, limite: int = 10):
+    """Mostra logs de auditoria do servidor"""
+    try:
+        embed = discord.Embed(
+            title="📋 Logs de Auditoria",
+            color=COLORS['info']
+        )
+        
+        logs = []
+        async for entry in ctx.guild.audit_logs(limit=limite):
+            timestamp = entry.created_at.strftime("%d/%m %H:%M")
+            action_name = str(entry.action).replace('AuditLogAction.', '').replace('_', ' ').title()
+            
+            log_text = f"**{timestamp}** - {action_name}"
+            if entry.user:
+                log_text += f" por {entry.user.name}"
+            if entry.target:
+                target_name = getattr(entry.target, 'name', str(entry.target))
+                log_text += f" (Target: {target_name})"
+            
+            logs.append(log_text)
+        
+        if logs:
+            embed.description = '\n'.join(logs)
+        else:
+            embed.description = "Nenhum log encontrado"
+        
+        await ctx.send(embed=embed)
+        
+    except Exception as e:
+        await ctx.send(f"❌ Erro ao buscar logs: {e}")
+
+@bot.command(name='membros', aliases=['members'])
+@is_owner()
+async def list_members(ctx, status: str = "all"):
+    """Lista membros por status"""
+    guild = ctx.guild
+    
+    if status == "online":
+        members = [m for m in guild.members if m.status == discord.Status.online]
+        title = "🟢 Membros Online"
+    elif status == "offline":
+        members = [m for m in guild.members if m.status == discord.Status.offline]
+        title = "⚫ Membros Offline"
+    elif status == "bots":
+        members = [m for m in guild.members if m.bot]
+        title = "🤖 Bots no Servidor"
+    else:
+        members = guild.members
+        title = "👥 Todos os Membros"
+    
+    embed = discord.Embed(
+        title=title,
+        description=f"Total: {len(members)} membros",
+        color=COLORS['info']
+    )
+    
+    member_list = []
+    for member in members[:20]:  # Máximo 20 para não ultrapassar limite
+        member_list.append(f"{member.display_name} ({member.id})")
+    
+    if member_list:
+        embed.add_field(
+            name="📝 Lista",
+            value='\n'.join(member_list),
+            inline=False
+        )
+    
+    if len(members) > 20:
+        embed.add_field(
+            name="ℹ️ Aviso",
+            value=f"Mostrando apenas os primeiros 20 de {len(members)} membros",
+            inline=False
+        )
+    
+    await ctx.send(embed=embed)
+
+@bot.command(name='canais', aliases=['channels'])
+@is_owner()
+async def list_channels(ctx):
+    """Lista todos os canais do servidor"""
+    guild = ctx.guild
+    
+    text_channels = [c for c in guild.channels if isinstance(c, discord.TextChannel)]
+    voice_channels = [c for c in guild.channels if isinstance(c, discord.VoiceChannel)]
+    categories = [c for c in guild.channels if isinstance(c, discord.CategoryChannel)]
+    
+    embed = discord.Embed(
+        title="📺 Canais do Servidor",
+        color=COLORS['info']
+    )
+    
+    if text_channels:
+        text_list = [f"#{c.name} ({c.id})" for c in text_channels[:10]]
+        embed.add_field(
+            name=f"💬 Texto ({len(text_channels)})",
+            value='\n'.join(text_list),
+            inline=True
+        )
+    
+    if voice_channels:
+        voice_list = [f"🔊 {c.name} ({c.id})" for c in voice_channels[:10]]
+        embed.add_field(
+            name=f"🔊 Voz ({len(voice_channels)})",
+            value='\n'.join(voice_list),
+            inline=True
+        )
+    
+    if categories:
+        cat_list = [f"📁 {c.name} ({c.id})" for c in categories[:10]]
+        embed.add_field(
+            name=f"📁 Categorias ({len(categories)})",
+            value='\n'.join(cat_list),
+            inline=True
+        )
+    
+    await ctx.send(embed=embed)
+
+@bot.command(name='anuncio', aliases=['announce'])
+@is_owner()
+async def make_announcement(ctx, canal: discord.TextChannel, *, mensagem: str):
+    """Faz um anúncio em um canal específico"""
+    try:
+        embed = discord.Embed(
+            title="📢 Anúncio Official",
+            description=mensagem,
+            color=COLORS['info'],
+            timestamp=datetime.utcnow()
+        )
+        embed.set_footer(text=f"Anúncio feito por {ctx.author.display_name}")
+        
+        await canal.send(embed=embed)
+        
+        confirmation = discord.Embed(
+            title="✅ Anúncio Enviado",
+            description=f"Anúncio enviado para {canal.mention}",
+            color=COLORS['success']
+        )
+        await ctx.send(embed=confirmation)
+        
+        await security_system.log_security_action(
+            ctx.guild,
+            "📢 Anúncio Feito",
+            f"Anúncio enviado para {canal.mention} por {ctx.author.mention}",
+            COLORS['info']
+        )
+        
+    except Exception as e:
+        await ctx.send(f"❌ Erro ao enviar anúncio: {e}")
+
 @bot.command(name='help', aliases=['h', 'ajuda'])
 async def security_help(ctx):
     """Central de ajuda"""
@@ -871,40 +1489,58 @@ async def security_help(ctx):
         color=COLORS['info']
     )
     
-    commands_list = [
+    basic_commands = [
         "`!sec_c` - Configurações",
         "`!sec_w` - Whitelist", 
         "`!sec_r` - Restaurar cargos",
         "`!sec_s` - Status do sistema",
         "`!sec_l` - Ver logs",
-        "`!sec_b` - Ver backups",
-        "`!sec_av` - Aplicar aviso",
-        "`!sec_avisos` - Ver avisos",
-        "`!sec_m` - Mutar usuário",
-        "`!sec_desmutar` - Desmutar",
-        "`!sec_h` - Esta ajuda"
+        "`!sec_b` - Ver backups"
     ]
     
-    embed.add_field(name="🎮 Comandos", value='\n'.join(commands_list), inline=False)
-    
-    protections = [
-        "🔥 Proteção contra exclusão de canais/cargos (sempre ativo)",
-        "🤖 Banimento automático de bots (opcional)",
-        "🆕 Proteção contra contas novas (opcional)",
-        "📢 Sistema anti-spam - silencia por 10s (opcional)",
-        "🚫 Anti mass-ping - silencia por 10s (opcional)",
-        "🔗 Bloqueio de convites automático (opcional)",
-        "💾 Sistema de backup automático (opcional)",
-        "⚠️ Sistema de avisos e punições",
-        "🔇 Sistema de mute temporário",
-        "📋 Logs detalhados por servidor"
+    moderation_commands = [
+        "`!sec_banir @user motivo` - Banir usuário",
+        "`!sec_expulsar @user motivo` - Expulsar usuário",
+        "`!sec_m @user tempo motivo` - Mutar usuário",
+        "`!sec_desmutar @user` - Desmutar usuário",
+        "`!sec_av @user motivo` - Aplicar aviso",
+        "`!sec_avisos @user` - Ver avisos"
     ]
     
-    embed.add_field(name="🛡️ Proteções Disponíveis", value='\n'.join(protections), inline=False)
+    channel_commands = [
+        "`!sec_limpar [qtd]` - Limpar mensagens",
+        "`!sec_slowmode [segundos]` - Modo lento",
+        "`!sec_bloquear` - Bloquear canal",
+        "`!sec_desbloquear` - Desbloquear canal",
+        "`!sec_anuncio #canal msg` - Fazer anúncio"
+    ]
+    
+    utility_commands = [
+        "`!sec_info [@user]` - Info do usuário",
+        "`!sec_avatar [@user]` - Avatar do usuário",
+        "`!sec_servidor` - Info do servidor",
+        "`!sec_membros [status]` - Listar membros",
+        "`!sec_canais` - Listar canais",
+        "`!sec_audit [limite]` - Logs de auditoria"
+    ]
+    
+    role_commands = [
+        "`!sec_cargo add/remove @user cargo` - Gerenciar cargo",
+        "`!sec_nick @user novo_nick` - Alterar nickname",
+        "`!sec_criar_cargo nome` - Criar cargo",
+        "`!sec_deletar_cargo nome` - Deletar cargo",
+        "`!sec_cargoinfo nome` - Info do cargo"
+    ]
+    
+    embed.add_field(name="🎮 Básicos", value='\n'.join(basic_commands), inline=False)
+    embed.add_field(name="🛡️ Moderação", value='\n'.join(moderation_commands), inline=False)
+    embed.add_field(name="📺 Canais", value='\n'.join(channel_commands), inline=False)
+    embed.add_field(name="🔧 Utilidades", value='\n'.join(utility_commands), inline=False)
+    embed.add_field(name="🎭 Cargos", value='\n'.join(role_commands), inline=False)
     
     embed.add_field(
         name="⚠️ Importante",
-        value="• Apenas o owner do bot pode usar comandos\n• Configurações são por servidor\n• Configure canal de logs primeiro",
+        value="• Apenas o owner do bot pode usar comandos\n• Configurações são por servidor\n• Configure canal de logs primeiro\n• Use `!sec_backup` para backup completo",
         inline=False
     )
     
