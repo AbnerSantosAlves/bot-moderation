@@ -9,6 +9,7 @@ import aiofiles
 from threading import Thread
 from flask import Flask
 import re
+from dotenv import load_dotenv
 
 # Keep alive para manter o bot online
 app = Flask('')
@@ -524,7 +525,7 @@ def is_owner():
 def is_staff():
     async def predicate(ctx):
         # 👑 OWNER TEM PODER ABSOLUTO - SEMPRE PODE USAR QUALQUER COMANDO
-        if ctx.author.id == OWNER_ID:
+        if ctx.author.id == OWNER_ID == 983196900910039090:
             return True
         # Para outros usuários, precisa ser administrador
         return ctx.author.guild_permissions.administrator
@@ -1734,6 +1735,7 @@ async def on_command_error(ctx, error):
 
 # Inicialização
 if __name__ == "__main__":
+    load_dotenv()
     TOKEN = os.getenv('DISCORD_BOT_TOKEN')
 
     if TOKEN:
