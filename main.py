@@ -30,7 +30,7 @@ OWNER_ID = 983196900910039090  # Substitua pelo seu ID real
 
 # Configurações padrão para novos servidores
 DEFAULT_CONFIG = {
-    'auto_ban_bots': True,
+    'auto_ban_bots': False,
     'auto_ban_new_accounts': False,
     'new_account_days': 7,
     'role_delete_punishment': 'remove_roles',
@@ -38,15 +38,16 @@ DEFAULT_CONFIG = {
     'logs_channel_id': None,
     'audit_log_delay': 2,
     'max_logs_history': 100,
-    'auto_kick_mass_ping': True,
+    'auto_kick_mass_ping': False,
     'max_mentions': 10,
     'auto_delete_invite_links': False,
     'whitelist_users': [],
     'protection_enabled': True,
-    'anti_spam_enabled': True,
+    'anti_spam_enabled': False,
     'spam_message_count': 5,
     'spam_time_window': 10,
-    'auto_mute_duration': 300,
+    'auto_mute_duration': 10,
+    'mass_ping_mute_duration': 10,
     'protect_admin_roles': True,
     'backup_channels': True,
     'backup_roles': True
@@ -430,15 +431,18 @@ async def on_message(message):
         if mention_count >= config['max_mentions']:
             try:
                 await message.delete()
-                await message.author.kick(reason=f"🔒 Mass ping: {mention_count} menções")
+                await message.author.timeout(
+                    timedelta(seconds=config['mass_ping_mute_duration']),
+                    reason=f"🔒 Mass ping: {mention_count} menções"
+                )
                 await security_system.log_security_action(
                     guild,
-                    "🚫 Usuário Expulso por Mass Ping",
-                    f"{message.author.mention} expulso por {mention_count} menções",
-                    COLORS['danger']
+                    "🚫 Usuário Silenciado por Mass Ping",
+                    f"{message.author.mention} silenciado por {config['mass_ping_mute_duration']}s ({mention_count} menções)",
+                    COLORS['warning']
                 )
             except Exception as e:
-                print(f"❌ Erro ao expulsar por mass ping: {e}")
+                print(f"❌ Erro ao silenciar por mass ping: {e}")
     
     # Anti convite
     if config['auto_delete_invite_links']:
@@ -479,11 +483,14 @@ async def config_security(ctx, setting: str = None, *, value: str = None):
         embed.add_field(name="📅 new_account_days", value=config['new_account_days'], inline=True)
         embed.add_field(name="🛡️ protection_enabled", value="✅" if config['protection_enabled'] else "❌", inline=True)
         embed.add_field(name="📢 anti_spam_enabled", value="✅" if config['anti_spam_enabled'] else "❌", inline=True)
+        embed.add_field(name="🚫 auto_kick_mass_ping", value="✅" if config['auto_kick_mass_ping'] else "❌", inline=True)
+        embed.add_field(name="🔗 auto_delete_invite_links", value="✅" if config['auto_delete_invite_links'] else "❌", inline=True)
+        embed.add_field(name="💾 backup_channels", value="✅" if config['backup_channels'] else "❌", inline=True)
         embed.add_field(name="📺 logs_channel_id", value=f"<#{config['logs_channel_id']}>" if config['logs_channel_id'] else "Não definido", inline=True)
         
         embed.add_field(
-            name="💡 Exemplo de uso:",
-            value="`!sec_c auto_ban_bots true`\n`!sec_c logs_channel_id #logs`",
+            name="💡 Exemplos de uso:",
+            value="`!sec_c auto_ban_bots true`\n`!sec_c anti_spam_enabled true`\n`!sec_c auto_mute_duration 10`\n`!sec_c logs_channel_id #logs`",
             inline=False
         )
         
@@ -501,6 +508,22 @@ async def config_security(ctx, setting: str = None, *, value: str = None):
         config['protection_enabled'] = value.lower() == 'true'
     elif setting == 'anti_spam_enabled':
         config['anti_spam_enabled'] = value.lower() == 'true'
+    elif setting == 'auto_kick_mass_ping':
+        config['auto_kick_mass_ping'] = value.lower() == 'true'
+    elif setting == 'auto_delete_invite_links':
+        config['auto_delete_invite_links'] = value.lower() == 'true'
+    elif setting == 'backup_channels':
+        config['backup_channels'] = value.lower() == 'true'
+    elif setting == 'backup_roles':
+        config['backup_roles'] = value.lower() == 'true'
+    elif setting == 'max_mentions':
+        config['max_mentions'] = int(value)
+    elif setting == 'spam_message_count':
+        config['spam_message_count'] = int(value)
+    elif setting == 'auto_mute_duration':
+        config['auto_mute_duration'] = int(value)
+    elif setting == 'mass_ping_mute_duration':
+        config['mass_ping_mute_duration'] = int(value)
     elif setting == 'logs_channel_id':
         if value.startswith('#'):
             channel = discord.utils.get(ctx.guild.channels, name=value[1:])
@@ -865,13 +888,13 @@ async def security_help(ctx):
     embed.add_field(name="🎮 Comandos", value='\n'.join(commands_list), inline=False)
     
     protections = [
-        "🔥 Proteção contra exclusão de canais/cargos",
-        "🤖 Banimento automático de bots",
-        "🆕 Proteção contra contas novas",
-        "📢 Sistema anti-spam avançado",
-        "🚫 Proteção contra mass ping",
-        "🔗 Bloqueio de convites automático",
-        "💾 Sistema de backup automático",
+        "🔥 Proteção contra exclusão de canais/cargos (sempre ativo)",
+        "🤖 Banimento automático de bots (opcional)",
+        "🆕 Proteção contra contas novas (opcional)",
+        "📢 Sistema anti-spam - silencia por 10s (opcional)",
+        "🚫 Anti mass-ping - silencia por 10s (opcional)",
+        "🔗 Bloqueio de convites automático (opcional)",
+        "💾 Sistema de backup automático (opcional)",
         "⚠️ Sistema de avisos e punições",
         "🔇 Sistema de mute temporário",
         "📋 Logs detalhados por servidor"
@@ -908,6 +931,11 @@ if __name__ == "__main__":
     
     if TOKEN:
         print("🚀 Iniciando Sistema de Segurança Avançado...")
+        print("⚙️ Configurações padrão:")
+        print("  • Proteção de canais/cargos: SEMPRE ATIVO")
+        print("  • Anti-spam: OPCIONAL (10s de silenciamento)")
+        print("  • Anti mass-ping: OPCIONAL (10s de silenciamento)")
+        print("  • Outras proteções: CONFIGURÁVEIS por servidor")
         keep_alive()
         bot.run(TOKEN)
     else:
